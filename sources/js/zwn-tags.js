@@ -10,7 +10,7 @@ export function zwnTag(id) {
     }
 
     const zwn_name = entry.name;
-    const zwn_date = entry.date;  // Fixed typo: was zwm_date
+    const zwn_date = entry.date;
     const _zwn_contained = entry.class;
 
     // Create main container
