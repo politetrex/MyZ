@@ -18,7 +18,7 @@ export function zwnTag(id) {
     
     // Create main link
     const mainLink = document.createElement('a');
-    mainLink.href = `../zwn.html?id=${id}`;
+    mainLink.href = `./zwn.html?id=${id}`;
     mainLink.textContent = zwn_name;
     
     // Create date text
@@ -39,7 +39,7 @@ export function zwnTag(id) {
         _zwn_contained.forEach((cid, index) => {
             const centry = zwc[cid];
             const classLink = document.createElement('a');
-            classLink.href = `../zwc.html?id=${cid}`;
+            classLink.href = `./zwc.html?id=${cid}`;
             classLink.textContent = centry ? centry.title : "Unknown Class";
             
             container.appendChild(classLink);

@@ -17,7 +17,7 @@ export function zwcTag(id) {
     
     // Create main category link
     const mainLink = document.createElement('a');
-    mainLink.href = `../zwc.html?id=${id}`;
+    mainLink.href = `./zwc.html?id=${id}`;
     mainLink.textContent = zwc_title;
     
     // Create date text
@@ -37,7 +37,7 @@ export function zwcTag(id) {
         _zwc_contained.forEach((articleId, index) => {
             const article = zwn[articleId];
             const articleLink = document.createElement('a');
-            articleLink.href = `../zwn.html?id=${articleId}`;
+            articleLink.href = `./zwn.html?id=${articleId}`;
             articleLink.textContent = article ? article.name : "Unknown Work";
             
             container.appendChild(articleLink);
