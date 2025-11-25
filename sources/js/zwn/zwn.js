@@ -11,21 +11,64 @@ if (id) {
     // load specific work
     const workData = zwn[id];
     if (workData) {
+        // Get the latest version (last one in the array)
+        const latestVersion = workData.versions[workData.versions.length - 1];
+        
         document.title = workData.name + " -- 我的作文区";
         const titleElem = document.createElement('h1');
         titleElem.textContent = workData.name;
         mainDiv.appendChild(titleElem);
         
+        // Version selector (only show if multiple versions exist)
+        if (workData.versions.length > 1) {
+            const versionContainer = document.createElement('div');
+            versionContainer.style.margin = '10px 0';
+            versionContainer.style.padding = '10px';
+            versionContainer.style.backgroundColor = '#f5f5f5';
+            versionContainer.style.borderRadius = '5px';
+            
+            const versionLabel = document.createElement('label');
+            versionLabel.textContent = '选择版本: ';
+            versionLabel.style.marginRight = '10px';
+            versionLabel.style.fontWeight = 'bold';
+            
+            const versionSelect = document.createElement('select');
+            versionSelect.id = 'version-select';
+            
+            // Add versions in chronological order (oldest to newest)
+            workData.versions.forEach((version, index) => {
+                const option = document.createElement('option');
+                const dateStr = version.date.toString();
+                const formattedDate = `${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
+                option.value = index;
+                option.textContent = `版本 ${index + 1} (${formattedDate})`;
+                
+                // Select the latest version by default
+                if (index === workData.versions.length - 1) {
+                    option.selected = true;
+                }
+                
+                versionSelect.appendChild(option);
+            });
+            
+            versionContainer.appendChild(versionLabel);
+            versionContainer.appendChild(versionSelect);
+            mainDiv.appendChild(versionContainer);
+        }
+        
         const dateElem = document.createElement('p');
-        const dateStr = workData.date.toString();
-        dateElem.textContent = `${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
+        const dateStr = latestVersion.date.toString();
+        dateElem.textContent = `发布于: ${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
+        
+        // Show version count if multiple versions
+        if (workData.versions.length > 1) {
+            dateElem.textContent += ` (共 ${workData.versions.length} 个版本)`;
+        }
+        
         mainDiv.appendChild(dateElem);
 
         const _zwn_contained = workData.class;
         if (_zwn_contained && _zwn_contained.length > 0) {
-            //const br = document.createElement('br');
-            //mainDiv.appendChild(br);
-            
             const containedText = document.createTextNode('包含于: ');
             mainDiv.appendChild(containedText);
     
@@ -48,13 +91,41 @@ if (id) {
         // Load and display the actual content
         const contentContainer = document.createElement('div');
         contentContainer.className = 'work-content';
+        contentContainer.id = 'content-container';
         mainDiv.appendChild(contentContainer);
         
-        workData.content.forEach(paragraph => {
-            const pElem = document.createElement('p');
-            pElem.textContent = paragraph;
-            contentContainer.appendChild(pElem);
-        });
+        // Function to display a specific version
+        function displayVersion(versionIndex) {
+            const version = workData.versions[versionIndex];
+            contentContainer.innerHTML = '';
+            
+            version.content.forEach(paragraph => {
+                if (paragraph && paragraph.trim() !== '') {
+                    const pElem = document.createElement('p');
+                    pElem.textContent = paragraph;
+                    contentContainer.appendChild(pElem);
+                }
+            });
+            
+            // Update the date display
+            const dateStr = version.date.toString();
+            dateElem.textContent = `发布于: ${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
+            if (workData.versions.length > 1) {
+                dateElem.textContent += ` (共 ${workData.versions.length} 个版本)`;
+            }
+        }
+        
+        // Display the latest version initially
+        displayVersion(workData.versions.length - 1);
+        
+        // Add event listener for version changes
+        if (workData.versions.length > 1) {
+            const versionSelect = document.getElementById('version-select');
+            versionSelect.addEventListener('change', function() {
+                displayVersion(parseInt(this.value));
+            });
+        }
+        
     } else {
         mainDiv.textContent = "未找到该作文。";
         console.error("Work data not found for id:", id);
@@ -72,9 +143,13 @@ if (id) {
     worksContainer.className = 'works-list';
     mainDiv.appendChild(worksContainer);
     
-    // Get all works and sort by date (newest first)
+    // Get all works and sort by latest version date (newest first)
     const allWorks = Object.entries(zwn)
-        .sort((a, b) => b[1].date - a[1].date);
+        .sort((a, b) => {
+            const aLatest = a[1].versions[a[1].versions.length - 1].date;
+            const bLatest = b[1].versions[b[1].versions.length - 1].date;
+            return bLatest - aLatest;
+        });
     
     if (allWorks.length === 0) {
         worksContainer.textContent = "暂无作文。";

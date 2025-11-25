@@ -10,19 +10,41 @@ export function zwnTag(id) {
     }
 
     const zwn_name = entry.name;
-    const zwn_date = entry.date;
+    // Get date from latest version
+    const latestVersion = entry.versions[entry.versions.length - 1];
+    const zwn_date = latestVersion.date;
     const _zwn_contained = entry.class;
 
     // Create main container
     const container = document.createElement('div');
+    container.style.marginBottom = '15px';
+    container.style.padding = '10px';
+    container.style.border = '1px solid #eee';
+    container.style.borderRadius = '5px';
     
     // Create main link
     const mainLink = document.createElement('a');
     mainLink.href = `./zwn.html?id=${id}`;
     mainLink.textContent = zwn_name;
+    mainLink.style.fontSize = '1.1em';
+    mainLink.style.fontWeight = 'bold';
+    mainLink.style.textDecoration = 'none';
+    
+    // Add version badge if multiple versions
+    if (entry.versions.length > 1) {
+        const versionBadge = document.createElement('span');
+        versionBadge.textContent = ` ${entry.versions.length}版`;
+        versionBadge.style.background = '#007bff';
+        versionBadge.style.color = 'white';
+        versionBadge.style.padding = '2px 6px';
+        versionBadge.style.borderRadius = '10px';
+        versionBadge.style.fontSize = '0.8em';
+        versionBadge.style.marginLeft = '5px';
+        mainLink.appendChild(versionBadge);
+    }
     
     // Create date text
-    const dateText = document.createTextNode(` · 创建于${zwn_date}`);
+    const dateText = document.createTextNode(` · 更新于${zwn_date}`);
     
     // Add main link and date to container
     container.appendChild(mainLink);
@@ -41,6 +63,8 @@ export function zwnTag(id) {
             const classLink = document.createElement('a');
             classLink.href = `./zwc.html?id=${cid}`;
             classLink.textContent = centry ? centry.title : "Unknown Class";
+            classLink.style.margin = '0 3px';
+            classLink.style.textDecoration = 'none';
             
             container.appendChild(classLink);
             
@@ -52,5 +76,5 @@ export function zwnTag(id) {
         });
     }
 
-    return container; // Now returns a DOM Node
+    return container;
 }
